@@ -1,12 +1,14 @@
 body {
     font-family: sans-serif;
-    width: 60%;
-    margin: 10px auto;
+    width: 550px;
+    margin: 0px auto;
 }
 
 h1 {
     text-align: center;
     font-family: sans-serif;
+    margin: 10px auto;
+    font-size: 38px;
 }
 
 .homeNav {
@@ -17,8 +19,6 @@ h1 {
 
 a, .submit {
     margin: 25px;
-    color: black;
-    background-color: rgb(113, 180, 182);
     text-decoration: none;
     padding: 5px;
     border-radius: 3px;
@@ -28,24 +28,30 @@ a, .submit {
 
 table {
     margin: 20px auto;
-    width: 350px;
+    width: 450px;
 }
 
 input {
-    width: 44px;
+    width: 70px;
     margin: auto;
     display: block;
+    font-size: 19px;
 }
 
 td, th {
     text-align: center;
-    width: 100px;
+    width: 120px;
+    font-size: 18px;
+    padding-bottom: 7px;
 }
 
 .submit {
     border: 0;
     margin: auto;
     display: block;
+    font-size: 19px;
+    background-color: #3C3744;
+    color: #FBFFF1;
 }
 
 p {
@@ -54,4 +60,36 @@ p {
 
 .back {
     margin: 15%;
+}
+
+.calculator {
+    background-color: #B4C5E4;
+    width: fit-content;
+    margin: auto;
+    border-radius: 10px;
+    padding: 1em;
+}
+
+header {
+    display: flex;
+    position: relative;
+    margin: 20px auto;
+}
+
+img {
+    width: 64px;
+    position: absolute; 
+    right: 35px;
+}
+
+a {
+    margin: 12px auto 12px 35px;
+    display: block;
+    width: fit-content;
+    background-color: #1F7A8C;
+    color: #FBFFF1;
+}
+
+h2 {
+    margin: 0 20px;
 }

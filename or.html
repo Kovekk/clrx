@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" >
+    <head>
+        <meta charset="UTF-8">
+        <title>TrueSight | Over-Refraction</title>
+        <link rel="stylesheet" href="./test-style.css">
+    </head>
+    <body>
+        <header>
+            <h1>TrueSight Calculator</h1>
+            <!-- <img src="./contact-lens.png" alt="Placeholder Logo"> -->
+        </header>
+        <a href="./index.html">CLRx Calculator</a>
+        <div class="calculator">
+            <h2>Current Contacts</h2>
+            <table>
+                <tr>
+                    <th>Side</th>
+                    <th>Sph</th>
+                    <th>Cyl</th>
+                    <th>Axis</th>
+                </tr>
+                <tr>
+                    <td class="bold">OD</td>
+                    <td><input type=text id="currentSphOD"></td>
+                    <td><input type=text id="currentCylOD"></td>
+                    <td><input type=text id="currentAxisOD"></td>
+                </tr>
+                <tr>
+                    <td class="bold">OS</td>
+                    <td><input type=text id="currentSphOS"></td>
+                    <td><input type=text id="currentCylOS"></td>
+                    <td><input type=text id="currentAxisOS"></td>
+                </tr>
+            </table>
+            <h2>Over-Refraction</h2>
+            <table>
+                <tr>
+                    <th>Side</th>
+                    <th>Sph</th>
+                    <th>Cyl</th>
+                    <th>Axis</th>
+                </tr>
+                <tr>
+                    <td class="bold">OD</td>
+                    <td><input type=text id="orSphOD"></td>
+                    <td><input type=text id="orCylOD"></td>
+                    <td><input type=text id="orAxisOD"></td>
+                </tr>
+                <tr>
+                    <td class="bold">OS</td>
+                    <td><input type=text id="orSphOS"></td>
+                    <td><input type=text id="orCylOS"></td>
+                    <td><input type=text id="orAxisOS"></td>
+                </tr>
+            </table>
+            <h2>New Contacts</h2>
+            <table>
+                <tr>
+                    <th>Side</th>
+                    <th>Sph</th>
+                    <th>Cyl</th>
+                    <th>Axis</th>
+                    <th>Sph Equivalent</th>
+                </tr>
+                <tr>
+                    <td class="bold">OD</td>
+                    <td><p id="newSphOD">Plano</p></td>
+                    <td><p id="newCylOD">Sph</p></td>
+                    <td><p id="newAxisOD"></p></td>
+                    <td><p id="sphEquivOD"></p></td>
+                </tr>
+                <tr>
+                    <td class="bold">OS</td>
+                    <td><p id="newSphOS">Plano</p></td>
+                    <td><p id="newCylOS">Sph</p></td>
+                    <td><p id="newAxisOS"></p></td>
+                    <td><p id="sphEquivOS"></p></td>
+                </tr>
+            </table>
+            <button onclick="convertOrClrx()" class="submit">Calculate</button>
+        </div>
+        
+
+
+        <script  src="./script.js"></script>
+    </body>
+</html>

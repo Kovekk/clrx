@@ -2,14 +2,66 @@
 <html lang="en" >
     <head>
         <meta charset="UTF-8">
-        <title>CodePen - cl over refraction calculator</title>
-        <link rel="stylesheet" href="./style.css">
+        <title>TrueSight | SRx to CLRx</title>
+        <link rel="stylesheet" href="./test-style.css">
     </head>
     <body>
-        <h1>Robert's Contact Prescription Converter</h1>
-        <div class="homeNav">
-            <a href="./glrxtoclrx.html">Glasses to Contacts</a>
-            <a href="./clrxoverrefraction.html">Over Refraction Calculator</a>
+        <header>
+            <h1>TrueSight Calculator</h1>
+            <!-- <img src="./contact-lens.png" alt="Placeholder Logo"> -->
+        </header>
+        <a href="./or.html">Over-Refraction</a>
+        <div class="calculator">
+            <h2>Manifest Refraction</h2>
+            <table>
+                <tr>
+                    <th>Side</th>
+                    <th>Sph</th>
+                    <th>Cyl</th>
+                    <th>Axis</th>
+                </tr>
+                <tr>
+                    <td class="bold">OD</td>
+                    <td><input type=text id="sphOD"></td>
+                    <td><input type=text id="cylOD"></td>
+                    <td><input type=text id="axisOD"></td>
+                </tr>
+                <tr>
+                    <td class="bold">OS</td>
+                    <td><input type=text id="sphOS"></td>
+                    <td><input type=text id="cylOS"></td>
+                    <td><input type=text id="axisOS"></td>
+                </tr>
+            </table>
+            <h2>New Contacts</h2>
+            <table>
+                <tr>
+                    <th>Side</th>
+                    <th>Sph</th>
+                    <th>Cyl</th>
+                    <th>Axis</th>
+                    <th>Sph Equivalent</th>
+                </tr>
+                <tr>
+                    <td class="bold">OD</td>
+                    <td><p id="newSphOD">Plano</p></td>
+                    <td><p id="newCylOD">Sph</p></td>
+                    <td><p id="newAxisOD"></p></td>
+                    <td><p id="sphEquivOD"></p></td>
+                </tr>
+                <tr>
+                    <td class="bold">OS</td>
+                    <td><p id="newSphOS">Plano</p></td>
+                    <td><p id="newCylOS">Sph</p></td>
+                    <td><p id="newAxisOS"></p></td>
+                    <td><p id="sphEquivOS"></p></td>
+                </tr>
+            </table>
+            <button onclick="convertToClrx()" class="submit">Calculate</button>
         </div>
+        
+
+
+        <script  src="./script.js"></script>
     </body>
 </html>
