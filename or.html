@@ -7,10 +7,10 @@
     </head>
     <body>
         <header>
-            <h1>TrueSight Calculator</h1>
+            <h1>Over-Refraction</h1>
             <!-- <img src="./contact-lens.png" alt="Placeholder Logo"> -->
         </header>
-        <a href="./index.html">CLRx Calculator</a>
+        <a href="./index.html">To CLRx Calculator</a>
         <div class="calculator">
             <h2>Current Contacts</h2>
             <table>
@@ -78,7 +78,10 @@
                     <td><p id="sphEquivOS"></p></td>
                 </tr>
             </table>
-            <button onclick="convertOrClrx()" class="submit">Calculate</button>
+            <div class="buttons">
+                <button onclick="convertOrClrx()" class="submit">Calculate</button>
+                <button onclick="roundClrx()" class="round">Round</button>
+            </div>
         </div>
         
 

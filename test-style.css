@@ -80,8 +80,7 @@ input[type="text"] {
     border-radius: 5px;
 }
 
-button.submit {
-    width: 100%;
+button.submit, button.round {
     padding: 10px;
     background-color: #4B73BE;
     color: white;
@@ -92,7 +91,20 @@ button.submit {
     transition: background-color 0.3s ease;
 }
 
-button.submit:hover {
+button.submit {
+    width: 60%;
+}
+
+button.round {
+    width: 30%;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+button.submit:hover, button.round:hover {
     background-color: #0056B3;
 }
 
