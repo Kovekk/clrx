@@ -1,239 +1,286 @@
-function convertToClrx() {
-    // Get the OD SRx
-    let sphOD = parseFloat(document.getElementById("sphOD").value);
-    let cylOD = parseFloat(document.getElementById("cylOD").value);
-    let axisOD = parseFloat(document.getElementById("axisOD").value);
+// Director function for creating CLRx from MRx
+function mrx_to_clrx(round = true) {
+  // Get the OD SRx
+  srxOD = {
+    sph: parseFloat(document.getElementById("sphOD").value),
+    cyl: parseFloat(document.getElementById("cylOD").value),
+    axs: parseFloat(document.getElementById("axisOD").value)
+  };
 
-    // Get the OS SRx
-    let sphOS = parseFloat(document.getElementById("sphOS").value);
-    let cylOS = parseFloat(document.getElementById("cylOS").value);
-    let axisOS = parseFloat(document.getElementById("axisOS").value);
+  // Get the OS SRx
+  srxOS = {
+    sph: parseFloat(document.getElementById("sphOS").value),
+    cyl: parseFloat(document.getElementById("cylOS").value),
+    axs: parseFloat(document.getElementById("axisOS").value)
+  };
 
-    // Calculate new OD and OS CLRx
-    const clrxOD = calcContacts(sphOD, cylOD, axisOD);
-    const clrxOS = calcContacts(sphOS, cylOS, axisOS);
-    const sphEquivOD = calcSphEquiv(clrxOD.sph, clrxOD.cyl);
-    const sphEquivOS = calcSphEquiv(clrxOS.sph, clrxOS.cyl);
+  // Check all values to ensure they are numbers. Convert to 0 where necessary
+  srxOD = is_rx_num(srxOD);
+  srxOS = is_rx_num(srxOS);
 
-    // Put new OD CLRx into the awaiting table
-    displaySph(document.getElementById("newSphOD"), clrxOD.sph);
-    displayCyl(document.getElementById("newCylOD"), document.getElementById("newAxisOD"), clrxOD.cyl, clrxOD.axis);
-    displaySphEquiv(document.getElementById("sphEquivOD"), sphEquivOD);
-
-    // document.getElementById("newSphOD").innerHTML = clrxOD.sph;
-    // if (!isNaN(clrxOD.cyl)) {
-    //     document.getElementById("newCylOD").innerHTML = clrxOD.cyl;
-    //     document.getElementById("newAxisOD").innerHTML = clrxOD.axis;
-    // }
-
-    // Put new OS CLRx into the awaiting table
-    displaySph(document.getElementById("newSphOS"), clrxOS.sph);
-    displayCyl(document.getElementById("newCylOS"), document.getElementById("newAxisOS"), clrxOS.cyl, clrxOS.axis);
-    displaySphEquiv(document.getElementById("sphEquivOS"), sphEquivOS);
-    // document.getElementById("newSphOS").innerHTML = clrxOS.sph;
-    // document.getElementById("newCylOS").innerHTML = clrxOS.cyl;
-    // document.getElementById("newAxisOS").innerHTML = clrxOS.axis;
-}
-
-function calcContacts(sphi, cyli, axisi) {
-    // make the incoming variables changable via 'let'.
-    let sph = (isNaN(sphi)) ? 0 : sphi;
-    let cyl = (isNaN(cyli)) ? 0 : cyli;
-    let axis = (isNaN(axisi)) ? 0 : axisi;
-
-    // If the incoming SRx is positive cyl, convert to minus cyl.
-    if (cyl > 0) {
-      sph = sph + cyl;
-      cyl = cyl * -1;
-      axis = (axis > 90) ? axis - 90 : axis + 90;
-    }
-
-    // If the incoming prescription is spherical, return the calculated sph power.
-    if (cyl == 0) {
-      const clrx = sph / (1 - (sph * 0.012));
-      return {sph: clrx.toFixed(2)};
-    }
-
-    // If the prescription is not spherical, calculate new sph and cyl.
-    else {
-      const sph1 = sph / (1 - (sph * 0.012));
-      const newSph = sph + cyl;
-      const sph2 = newSph / (1 - (newSph * 0.012));
-      const newcyl = (sph2 - sph1);
-      return {sph: sph1.toFixed(2), cyl: newcyl.toFixed(2), axis: axis};
-
-    //   document.getElementById("prescription").innerHTML = (Math.round(clrx * 4) / 4).toFixed(2);
-    }
+  // Convert plus cyl to minus cyl where necessary
+  if (srxOD.cyl > 0) {
+    srxOD = swap_plus_minus(srxOD);
+  }
+  if (srxOS.cyl > 0) {
+    srxOS = swap_plus_minus(srxOS);
   }
 
-function convertOrClrx() {
-    // Get OD current cl
-    const currentSphOD = parseFloat(document.getElementById("currentSphOD").value);
-    const currentCylOD = parseFloat(document.getElementById("currentCylOD").value);
-    const currentAxisOD = parseFloat(document.getElementById("currentAxisOD").value);
+  // Calculate CLRx for OD and OS
+  clrxOD = calc_clrx_from_mrx(srxOD);
+  clrxOS = calc_clrx_from_mrx(srxOS);
 
-    // Get OD over refraction
-    const orSphOD = parseFloat(document.getElementById("orSphOD").value);
-    const orCylOD = parseFloat(document.getElementById("orCylOD").value);
-    const orAxisOD = parseFloat(document.getElementById("orAxisOD").value);
-    
-    // Get OS current cl
-    const currentSphOS = parseFloat(document.getElementById("currentSphOS").value);
-    const currentCylOS = parseFloat(document.getElementById("currentCylOS").value);
-    const currentAxisOS = parseFloat(document.getElementById("currentAxisOS").value);
+  // Round the results if round equals true
+  if (round == true) {
+    clrxOD = round_clrx(clrxOD);
+    clrxOS = round_clrx(clrxOS);
+  }
 
-    // Get OS over refraction
-    const orSphOS = parseFloat(document.getElementById("orSphOS").value);
-    const orCylOS = parseFloat(document.getElementById("orCylOS").value);
-    const orAxisOS = parseFloat(document.getElementById("orAxisOS").value);
+  // Calculate the spherical equivilent for OD and OS
+  sph_equivOD = calc_sph_equiv(clrxOD);
+  sph_equivOS = calc_sph_equiv(clrxOS);
 
-    // Calculate the overrefraction for OD and OS
-    const newCLRxOD = calcNewContacts(currentSphOD, currentCylOD, currentAxisOD, orSphOD, orCylOD, orAxisOD);
-    const newCLRxOS = calcNewContacts(currentSphOS, currentCylOS, currentAxisOS, orSphOS, orCylOS, orAxisOS);
-    const sphEquivOD = calcSphEquiv(newCLRxOD.sph, newCLRxOD.cyl);
-    const sphEquivOS = calcSphEquiv(newCLRxOS.sph, newCLRxOS.cyl);
-
-    // Place the new CLRx into the table
-    // OD
-    displaySph(document.getElementById("newSphOD"), newCLRxOD.sph.toFixed(2));
-    const newAxisOD = (newCLRxOD.axis > 90) ? newCLRxOD.axis - 90 : newCLRxOD.axis + 90;
-    displayCyl(document.getElementById("newCylOD"), document.getElementById("newAxisOD"), newCLRxOD.cyl.toFixed(2), newAxisOD);
-    displaySphEquiv(document.getElementById("sphEquivOD"), sphEquivOD);
-
-    // OS
-    displaySph(document.getElementById("newSphOS"), newCLRxOS.sph.toFixed(2));
-    const newAxisOS = (newCLRxOS.axis > 90) ? newCLRxOS.axis - 90 : newCLRxOS.axis + 90;
-    displayCyl(document.getElementById("newCylOS"), document.getElementById("newAxisOS"), newCLRxOS.cyl.toFixed(2), newAxisOS);
-    displaySphEquiv(document.getElementById("sphEquivOS"), sphEquivOS);
+  // Display the results
+  display_srx(clrxOD, "OD");
+  display_srx(clrxOS, "OS");
+  display_sph_equiv(sph_equivOD, "OD");
+  display_sph_equiv(sph_equivOS, "OS");
 }
 
-  function calcNewContacts(clSphi, clCyli, clAxisi, orSphi, orCyli, orAxisi) {
-    //set important variables that need to be changeable
-    let newClrx = {};
-    let clSph = (isNaN(clSphi)) ? 0 : clSphi;//(axis > 90) ? axis - 90 : axis + 90
-    let clCyl = (isNaN(clCyli)) ? 0 : clCyli;
-    let clAxis = (isNaN(clAxisi)) ? 0 : clAxisi;
-    let orSph = (isNaN(orSphi)) ? 0 : orSphi;
-    let orCyl = (isNaN(orCyli)) ? 0 : orCyli;
-    let orAxis = (isNaN(orAxisi)) ? 0 : orAxisi;
-    
-    // convert to plus cyl if necessary
-    let currentCl = {sph: clSph, cyl: clCyl, axis: clAxis};
-    if (clCyl > 0) {currentCl = convert(clSph, clCyl, clAxis);}
-  
-    // console.log(currentCl)
-    
-    // convert to plus cyl if necessary
-    let overRefraction = {sph: orSph, cyl: orCyl, axis: orAxis};
-    if (orCyl > 0) {overRefraction = convert(orSph, orCyl, orAxis);}
-    
-    // console.log(overRefraction)
-    
-    // select the smaller angle as group 1
-    if (clAxis < orAxis) {
-      newClrx = doConversion(currentCl.sph, currentCl.cyl, currentCl.axis, overRefraction.sph, overRefraction.cyl, overRefraction.axis);
-      if (newClrx.cyl > 0) {newClrx = convert(newClrx.sph, newClrx.cyl, newClrx.axis)}
-      return newClrx;
-    } else {
-      newClrx = doConversion(overRefraction.sph, overRefraction.cyl, overRefraction.axis, currentCl.sph, currentCl.cyl, currentCl.axis);
-      if (newClrx.cyl > 0) {newClrx = convert(newClrx.sph, newClrx.cyl, newClrx.axis)}
-      return newClrx;
-    }
+// Function to calculate the CLRx from the MRx
+function calc_clrx_from_mrx(srx) {
+  // If cyl is 0 claculate ony sph power
+  if (srx.cyl == 0) {
+    const clrx = srx.sph / (1 - (srx.sph * 0.012));
+    return {sph: clrx};
+  }
+
+  // If cyl is not 0 do full conversion to CLRx
+  else {
+    // First find the second axis' sph power
+    const newSph = srx.sph + srx.cyl;
+
+    // Convert both powers from 12mm distance to 0mm distance
+    const sph1 = srx.sph / (1 - (srx.sph * 0.012));
+    const sph2 = newSph / (1 - (newSph * 0.012));
+
+    // Calculate new cyl using converted numbers
+    const newCyl = (sph2 - sph1);
+
+    // return the new CLRx
+    return {sph: sph1, cyl: newCyl, axs: srx.axs};
+  }
+}
+
+
+// Director function for creating CLRx from current CLRx and over-refraction
+function over_refraction(round = true) {
+  // Get the OD MRx
+  mrxOD = {
+    sph: parseFloat(document.getElementById("orSphOD").value),
+    cyl: parseFloat(document.getElementById("orCylOD").value),
+    axs: parseFloat(document.getElementById("orAxisOD").value)
+  };
+
+  // Get the OS MRx
+  mrxOS = {
+    sph: parseFloat(document.getElementById("orSphOS").value),
+    cyl: parseFloat(document.getElementById("orCylOS").value),
+    axs: parseFloat(document.getElementById("orAxisOS").value)
+  };
+
+  // Get the OD CLRx
+  clrxOD = {
+    sph: parseFloat(document.getElementById("currentSphOD").value),
+    cyl: parseFloat(document.getElementById("currentCylOD").value),
+    axs: parseFloat(document.getElementById("currentAxisOD").value)
+  }
+
+  // Get the OS CLRx
+  clrxOS = {
+    sph: parseFloat(document.getElementById("currentSphOS").value),
+    cyl: parseFloat(document.getElementById("currentCylOS").value),
+    axs: parseFloat(document.getElementById("currentAxisOS").value)
   }
   
-  function doConversion(sph1, cyl1, axis1, sph2, cyl2, axis2) {
-    // calculate the coordinate of point R
-    const x1 = cyl1 * (Math.cos(2 * axis1 * Math.PI / 180));
-    const y1 = cyl1 * (Math.sin(2 * axis1 * Math.PI / 180));
-    const x2 = cyl2 * (Math.cos(2 * axis2 * Math.PI / 180));
-    const y2 = cyl2 * (Math.sin(2 * axis2 * Math.PI / 180));
-    const xR = x1 + x2;
-    const yR = y1 + y2;
-    
-    // console.log(`x1: ${x1}, x2: ${x2}, y1: ${y1}, y2: ${y2}, xR: ${xR}, yR: ${yR},`);
-    
-    // Find the new cylinder power
-    const cylR = Math.sqrt((xR * xR) + (yR * yR));
-    
-    // Total spherical power
-    const sphT = ((cyl1 + cyl2 - cylR) / 2) + sph1 + sph2;
-    // console.log(typeof sphT.toFixed(2))
-    
-    // Get the new axis
-    const a = axis2 - axis1;
-    const tan2B = (cyl2 * Math.sin(2 * a * Math.PI / 180)) / (cyl1 + cyl2 * Math.cos(2 * a * Math.PI / 180));
-    const B = (Math.atan(tan2B) * 180 / Math.PI) / 2
-    const rOSA = axis1 + B;
-    
-    // console.log(`a: ${a}, tan2B: ${tan2B}, B: ${B}`)
-    
-    return {sph: sphT, cyl: cylR, axis: rOSA};
+  // Check all values to ensure they are numbers. Convert to 0 where necessary
+  mrxOD = is_rx_num(mrxOD);
+  mrxOS = is_rx_num(mrxOS);
+  clrxOD = is_rx_num(clrxOD);
+  clrxOS = is_rx_num(clrxOS);
+
+  // Convert minus cyl to plus cyl where necessary
+  if (mrxOD.cyl < 0) {
+    mrxOD = swap_plus_minus(mrxOD);
+  }
+  if (mrxOS.cyl < 0) {
+    mrxOS = swap_plus_minus(mrxOS);
+  }
+  if (clrxOD.cyl < 0) {
+    clrxOD = swap_plus_minus(clrxOD);
+  }
+  if (clrxOS.cyl < 0) {
+    clrxOS = swap_plus_minus(clrxOS);
   }
 
-
-  // Takes a prescription and flips between plus cyl and minus cyl
-  function convert(sph, cyl, axis) {
-    const newSph = sph + cyl;
-    const newCyl = cyl * -1;
-    const newAxis = (axis > 90) ? axis - 90 : axis + 90;
-    return {sph: newSph, cyl: newCyl, axis: newAxis}
+  // Calculate the new CLRx with over-refraction
+  // If clrxOD axis is less than mrxOD axis set clrxOD as first variable
+  if (clrxOD.axs < mrxOD.axs) {
+    new_clrxOD = calc_or(clrxOD, mrxOD);
   }
 
-function displaySph(element, sph) {
-    if (sph == 0 || isNaN(sph)) {
-        element.innerHTML = "plano";
-    } else {
-        element.innerHTML = sph;
-    }
+  // Otherwise mrxOD should be first
+  else {
+    new_clrxOD = calc_or(mrxOD, clrxOD);
+  }
+
+  // Same for OS
+  if (clrxOS.axs < mrxOS.axs) {
+    new_clrxOS = calc_or(clrxOS, mrxOS);
+  }
+  else {
+    new_clrxOS = calc_or(mrxOS, clrxOS);
+  }
+
+  // Convert to minus cyl if necessary
+  if (new_clrxOD.cyl > 0) {
+    new_clrxOD = swap_plus_minus(new_clrxOD);
+  }
+  if (new_clrxOS.cyl > 0) {
+    new_clrxOS = swap_plus_minus(new_clrxOS);
+  }
+
+  // Round the results if round equals true
+  if (round == true) {
+    new_clrxOD = round_clrx(new_clrxOD);
+    new_clrxOS = round_clrx(new_clrxOS);
+  }
+
+  // Calculate the spherical equivilent for OD and OS
+  sph_equivOD = calc_sph_equiv(new_clrxOD);
+  sph_equivOS = calc_sph_equiv(new_clrxOS);
+
+  // Display the results
+  display_srx(new_clrxOD, "OD");
+  display_srx(new_clrxOS, "OS");
+  display_sph_equiv(sph_equivOD, "OD");
+  display_sph_equiv(sph_equivOS, "OS");
 }
 
-function displayCyl(elementCyl, elementAxis, cyl, axis) {
-    if (cyl == 0 || isNaN(cyl)) {
-        elementCyl.innerHTML = "sph";
-        elementAxis.innerHTML = "";
-    } else {
-        elementCyl.innerHTML = cyl;
-        elementAxis.innerHTML = Math.round(axis);
-    }
+// Perform over-refraction calculation
+function calc_or(rx1, rx2) {
+  // calculate the coordinate of point R
+  const x1 = rx1.cyl * (Math.cos(2 * rx1.axs * Math.PI / 180));
+  const y1 = rx1.cyl * (Math.sin(2 * rx1.axs * Math.PI / 180));
+  const x2 = rx2.cyl * (Math.cos(2 * rx2.axs * Math.PI / 180));
+  const y2 = rx2.cyl * (Math.sin(2 * rx2.axs * Math.PI / 180));
+  const xR = x1 + x2;
+  const yR = y1 + y2;
+  
+  // Find the new cylinder power
+  const cylR = Math.sqrt((xR * xR) + (yR * yR));
+  
+  // Total spherical power
+  const sphT = ((rx1.cyl + rx2.cyl - cylR) / 2) + rx1.sph + rx2.sph;
+  
+  // Get the new axis
+  const a = rx2.axs - rx1.axs;
+  const tan2B = (rx2.cyl * Math.sin(2 * a * Math.PI / 180)) / (rx1.cyl + rx2.cyl * Math.cos(2 * a * Math.PI / 180));
+  const B = (Math.atan(tan2B) * 180 / Math.PI) / 2
+  const rOSA = rx1.axs + B;
+  
+  // Return the new CLRx
+  return {sph: sphT, cyl: cylR, axs: rOSA};
 }
 
-function displaySphEquiv(element, sphEquiv) {
-  // console.log(sphEquiv)
-  if (sphEquiv == 0 || isNaN(sphEquiv)) {
-    element.innerHTML = "sph";
+
+// HELPER FUNCTIONS
+
+// Swap cyl between plus and minus
+function swap_plus_minus(rx) {
+  const newSph = rx.sph + rx.cyl;
+  const newCyl = rx.cyl * -1;
+  const newAxis = (rx.axs > 90) ? rx.axs - 90 : rx.axs + 90;
+  return {sph: newSph, cyl: newCyl, axs: newAxis}
+}
+
+// Calculate spherical equivalent
+function calc_sph_equiv(clrx) {
+  const sphEquiv = parseFloat(clrx.sph) + (clrx.cyl / 2);
+  return (Math.floor((sphEquiv * 4) + 0.5) / 4);
+}
+
+// round CLRx to nearest available contact prescription
+function round_clrx(clrx) {
+  const sph = Math.round(clrx.sph * 4) / 4;
+  const cyl = Math.round((clrx.cyl + 0.25) * 2) / 2 - 0.25;
+  return {sph: sph, cyl: cyl, axs: clrx.axs};
+}
+
+// Check values to ensure they can be converted to numbers
+function is_rx_num(rx) {
+  let sph = (isNaN(rx.sph)) ? 0 : rx.sph;
+  let cyl = (isNaN(rx.cyl)) ? 0 : rx.cyl;
+  let axs = (isNaN(rx.axs)) ? 0 : rx.axs;
+  return {sph: sph, cyl: cyl, axs: axs};
+}
+
+// Display new CLRx
+function display_srx(srx, side) {
+  // Get the elements from the html
+  const sphElement = document.getElementById("newSph" + side);
+  const cylElement = document.getElementById("newCyl" + side);
+  const axsElement = document.getElementById("newAxis" + side);
+
+  // If the sph is 0 then display "Plano"
+  if (srx.sph == 0) {
+    sphElement.innerHTML = "Plano";
+  // Otherwise display the sph
+  } 
+  // If sph is positive display + in front of number
+  else if (srx.sph > 0) {
+    sphElement.innerHTML = "+" + srx.sph.toFixed(2)
+  }
+  // Otherwise just display sph
+  else {
+  sphElement.innerHTML = srx.sph.toFixed(2);
+  }
+
+  // If the cyl is 0 then display "Sph" and leave axis blank
+  if (srx.cyl == 0) {
+    cylElement.innerHTML = "Sph";
+    axsElement.innerHTML = "";
+  // Otherwise display the cyl and axis
+  } else if (srx.cyl > 0) {
+    cylElement.innerHTML = "+" + srx.cyl.toFixed(2);
+    axsElement.innerHTML = Math.round(srx.axs);
   } else {
-    element.innerHTML = sphEquiv;
+    cylElement.innerHTML = srx.cyl.toFixed(2);
+    axsElement.innerHTML = Math.round(srx.axs);
   }
 }
 
-function calcSphEquiv(sph, cyl) {
-  // console.log(sph)
-  // console.log(cyl)
-  const sphEquiv = parseFloat(sph) + (cyl / 2);
-  return (Math.round(sphEquiv * 4) / 4).toFixed(2);
+function display_sph_equiv(sphEquiv, side) {
+  // Get the sph equivalent element
+  const equivElement = document.getElementById("sphEquiv" + side);
+  // Display the sph equivalent
+  if (sphEquiv > 0) {
+    equivElement.innerHTML = "+" + sphEquiv.toFixed(2);
+  } else {
+    equivElement.innerHTML = sphEquiv.toFixed(2);
+  }
 }
 
-function roundClrx() {
-  const sphOD = parseFloat(document.getElementById("newSphOD").innerHTML);
-  const cylOD = parseFloat(document.getElementById("newCylOD").innerHTML);
-  const sphOS = parseFloat(document.getElementById("newSphOS").innerHTML);
-  const cylOS = parseFloat(document.getElementById("newCylOS").innerHTML);
+// When enter is pressed, calc contacts
+const elements = document.querySelectorAll('input[type="number"]');
 
-  const newSphOD = (Math.round(sphOD * 4) / 4).toFixed(2);
-  const newCylOD = (Math.round((cylOD + 0.25) * 2) / 2 - 0.25).toFixed(2);
-  const newSphOS = (Math.round(sphOS * 4) / 4).toFixed(2);
-  const newCylOS = (Math.round((cylOS + 0.25) * 2) / 2 - 0.25).toFixed(2);
-
-  document.getElementById("newSphOD").innerHTML = (isNaN(newSphOD)) ? "Plano" : newSphOD;
-  document.getElementById("newCylOD").innerHTML = (isNaN(newCylOD)) ? "Sph" : newCylOD;
-  document.getElementById("newSphOS").innerHTML = (isNaN(newSphOS)) ? "Plano" : newSphOS;
-  document.getElementById("newCylOS").innerHTML = (isNaN(newCylOS)) ? "Sph" : newCylOS;
-
-  // const sphEquivOD = calcSphEquiv(newSphOD, newCylOD);
-  // const sphEquivOS = calcSphEquiv(newSphOS, newCylOS);
-  // displaySphEquiv(document.getElementById("sphEquivOD"), sphEquivOD);
-  // displaySphEquiv(document.getElementById("sphEquivOS"), sphEquivOS);
-}
-
-
-//((test + 0.25) * 2) / 2 - 0.25
+elements.forEach(element => {
+  // Execute a function when the user presses a key on the keyboard
+  element.addEventListener("keypress", function(event) {
+    // If the user presses the "Enter" key on the keyboard
+    if (event.key === "Enter") {
+      // Trigger the button element with a click
+      document.getElementById("calculate").click();
+    }
+  });
+});
